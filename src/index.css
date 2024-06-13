@@ -1,0 +1,42 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: local("DM Sans"),url('./Assets/Fonts/static/DMSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans Regular';
+  src: local("DM Sans Regular"),url('./Assets/Fonts/static/DMSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans Bold';
+  src: local("DM Sans Bold"),url('./Assets/Fonts/static/DMSans-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans Medium';
+  src: local("DM Sans Medium"),url('./Assets/Fonts/static/DMSans-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'DM Sans Light';
+  src: local("DM Sans Light"),url('./Assets/Fonts/static/DMSans-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans Italic';
+  src: local("DM Sans Italic"),url('./Assets/Fonts/static/DMSans-Italic.ttf') format('truetype');
+}
