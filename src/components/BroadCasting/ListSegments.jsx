@@ -87,7 +87,7 @@ export default function ListSegments() {
     <Box
       sx={{
         p: 1,
-        height: "300px",
+        height: "400px",
         width: "100%",
         backgroundColor: "#FFF",
         borderRadius: "12px",

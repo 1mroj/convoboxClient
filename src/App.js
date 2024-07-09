@@ -13,8 +13,29 @@ import VerifyOTP from "./Screens/Auth/VerifyOTP";
 function App() {
   return (
     <div className="App">
-      <Router basename="/app">
+      {/* <Router basename="/">
         <Routes>
+          <Route
+            path="/*"
+            element={
+              <ThemeProvider theme={theme}>
+                <Layouts />
+              </ThemeProvider>
+            }
+          />
+        </Routes>
+      </Router> */}
+
+      <Router basename="/">
+        <Routes>
+          <Route
+            path="/*"
+            element={
+              <ThemeProvider theme={theme}>
+                <Layouts />
+              </ThemeProvider>
+            }
+          />
           {/* <Route path="/auth/forgot-password" element={<ForgotPassword />} /> */}
           {/* <Route path="/auth" element={<Login />} /> */}
           {/* <Route path="/auth/signup" element={<SignUp />} /> */}
