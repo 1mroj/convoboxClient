@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../../auth/axiosConfig.js";
-import { FB_APP_ID, FB_CONFIG_ID, SERVER_BASE_URL } from "../../contants.js";
+import { FB_APP_ID, FB_CONFIG_ID, SERVER_BASE_URL } from "../../constants.js";
 import { Box, Button, Typography, Grid } from "@mui/material";
+import WhatsAppIcon from "../../Assets/whatsapplogo.svg";
 
 // Load the JavaScript SDK asynchronously
 (function (d, s, id) {
@@ -32,11 +33,13 @@ async function launchWhatsAppSignup(setCode, setAccessToken) {
   //window.fbq && window.fbq('trackCustom', 'WhatsAppOnboardingStart', { appId: FB_APP_ID, feature: 'whatsapp_embedded_signup' });
   window.FB.login(
     function (response) {
-      if (response.authResponse.code) {
-        setCode(response.authResponse.code);
+      console?.log(response);
+      if (response?.authResponse?.code) {
+        console.log(response?.authResponse?.code);
+        setCode(response?.authResponse?.code);
       }
-      if (response.authResponse.accessToken) {
-        setAccessToken(response.authResponse.accessToken);
+      if (response?.authResponse?.accessToken) {
+        setAccessToken(response?.authResponse?.accessToken);
       }
     },
     {
@@ -56,6 +59,7 @@ const sessionInfoListener = (event, setSignupData) => {
     if (data.type === "WA_EMBEDDED_SIGNUP") {
       if (data.event === "FINISH") {
         const { phone_number_id, waba_id } = data.data;
+        console.log(data?.data);
         setSignupData({
           phoneNumberId: phone_number_id,
           whatsappBusinessAccountId: waba_id,
@@ -69,25 +73,19 @@ const sessionInfoListener = (event, setSignupData) => {
   }
 };
 
-const FacebookLoginComponent = (props) => {
-  const [instanceId, setInstanceId] = useState(props.instanceId);
+const FacebookLoginComponent = ({ type }) => {
+  // const [instanceId, setInstanceId] = useState(props.instanceId);
   const [code, setCode] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [signupData, setSignupData] = useState([]);
 
   const handleSignupComplete = async () => {
-    const response = await axiosInstance.post(
-      `/common/whatsapp/requestAccessToken`,
-      { instanceId: instanceId, code: code, ...signupData }
-    );
-  };
-  const handleDebug = async () => {
-    const response = await axiosInstance.post(`/common/whatsapp/debugToken`, {
-      instanceId: instanceId,
-      accessToken: accessToken,
+    const response = await axiosInstance.post(`/api/whatsapp/requesttoken`, {
+      code: code,
       ...signupData,
     });
   };
+
 
   useEffect(() => {
     const listener = (event) => {
@@ -97,7 +95,7 @@ const FacebookLoginComponent = (props) => {
     return () => {
       window.removeEventListener("message", listener);
     };
-  }, [code, instanceId]);
+  }, [code]);
 
   useEffect(() => {
     if (code) {
@@ -105,35 +103,70 @@ const FacebookLoginComponent = (props) => {
     }
   }, [code]);
 
-  useEffect(() => {
-    if (accessToken) {
-      handleDebug();
-    }
-  }, [accessToken]);
+
   return (
-    <Button
-      onClick={() => {
-        launchWhatsAppSignup(setCode, setAccessToken);
-      }}
-      variant="contained"
-      sx={{
-        fontFamily: "DM Sans Bold",
-        minHeight: "40px",
-        minWidth: "180px",
-        borderRadius: "12px",
-        color: "#FFFFFF",
-        backgroundColor: "#7F2DF1",
-        textTransform: "none",
-        fontSize: "16px",
-        textDecoration: "none",
-        "&:hover": {
-          backgroundColor: "#1877F2", // Change the background color on hover
-          color: "#FFFFFF", // Change the text color on hover
-        },
-      }}
-    >
-      Launch Whatsapp Signup
-    </Button>
+    <>
+      {type === "onboard" ? (
+        <Button
+          variant="contained"
+          onClick={() => {
+            launchWhatsAppSignup(setCode, setAccessToken);
+          }}
+          sx={{
+            color: "#FFF",
+            pl: 5,
+            pr: 5,
+            textTransform: "none",
+            fontSize: "16px",
+            fontWeight: 500,
+            borderRadius: "10px",
+            backgroundColor: "#7F2DF1",
+            boxShadow: "none",
+            "&:hover": {
+              backgroundColor: "#7F2DF1", // Grayish background color
+              color: "#FFF",
+              boxShadow: "none",
+            },
+          }}
+        >
+          Launch WhatsApp Onboarding{" "}
+        </Button>
+      ) : (
+        <Button
+          variant="contained"
+          sx={{
+            color: "#7F2DF1",
+            pl: 4,
+            pr: 4,
+            mr: 2,
+            textTransform: "none",
+            fontSize: "16px",
+            fontWeight: 500,
+            borderRadius: "10px",
+            backgroundColor: "#FFF",
+            boxShadow: "none",
+            "&:hover": {
+              backgroundColor: "#f5f5f5", // Grayish background color
+              color: "#5e16c4",
+              boxShadow: "none",
+            },
+          }}
+          onClick={() => {
+            launchWhatsAppSignup(setCode, setAccessToken);
+          }}
+          startIcon={
+            <img
+              height="25px"
+              width="25px"
+              src={WhatsAppIcon}
+              alt="WhatsApp Icon"
+            />
+          }
+        >
+          Apply for WhatsApp Business API ( FREE )
+        </Button>
+      )}
+    </>
   );
 };
 
