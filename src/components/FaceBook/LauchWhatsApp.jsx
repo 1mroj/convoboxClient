@@ -74,7 +74,6 @@ const sessionInfoListener = (event, setSignupData) => {
 };
 
 const FacebookLoginComponent = ({ type }) => {
-  // const [instanceId, setInstanceId] = useState(props.instanceId);
   const [code, setCode] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [signupData, setSignupData] = useState([]);
@@ -85,7 +84,12 @@ const FacebookLoginComponent = ({ type }) => {
       ...signupData,
     });
   };
-
+  // const handleDebug = async () => {
+  //   const response = await axiosInstance.post(`/common/whatsapp/debugToken`, {
+  //     accessToken: accessToken,
+  //     ...signupData,
+  //   });
+  // };
 
   useEffect(() => {
     const listener = (event) => {
@@ -102,7 +106,6 @@ const FacebookLoginComponent = ({ type }) => {
       handleSignupComplete();
     }
   }, [code]);
-
 
   return (
     <>

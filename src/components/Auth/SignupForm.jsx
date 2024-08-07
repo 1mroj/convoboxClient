@@ -11,6 +11,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import useSignIn from "react-auth-kit/hooks/useSignIn";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "../../constants";
 import ShowMessage from "../Utils/snackbar";
@@ -53,6 +54,8 @@ const textFields = [
 
 export function SignUpForm() {
   const navigate = useNavigate();
+  const signIn = useSignIn();
+
   const [formValues, setFormValues] = useState({
     name: "",
     email: "",
@@ -158,6 +161,16 @@ export function SignUpForm() {
         setOpenSnackBar(true);
         setSeverity("error");
       } else if (response.status === 200) {
+        console.log(response?.data);
+        signIn({
+          userState: {
+            name: response?.data?.user?.name,
+            email: response?.data?.user?.email,
+            phone: response?.data?.user?.phone,
+            userid: response?.data?.user?.id,
+          },
+        });
+
         navigate("/dashboard");
       }
     } catch (error) {
@@ -316,4 +329,3 @@ export function SignUpForm() {
     </>
   );
 }
-

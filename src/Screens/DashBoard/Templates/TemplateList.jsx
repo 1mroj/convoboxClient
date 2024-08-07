@@ -4,10 +4,14 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import TemplateGrid from "../../../components/Templates/TemplateList/TemplateGrid";
+import ListBroadcasting from "../../../components/BroadCasting/ListBroadcasting";
+import SelectTemplate from "../../../components/BroadCasting/SelectTemplate";
+import TemplateServices from "../../../Services/TemplateService";
+import axiosInstance from "../../../auth/axiosConfig";
 
 const textInputProps = {
   border: "1px solid #848396",
@@ -27,12 +31,43 @@ const textInputProps = {
 export default function Templates() {
   const navigate = useNavigate();
   const [selectedTemplateType, setSelectedTemplateType] = useState("All");
+  const [templates, setTemplates] = useState([]);
   const templateCategory = ["All", "Approved", "Pending", "Rejected", "Draft"];
+  const buisnessInfo = {
+    id: "269217646268372",
+  };
+
+  const getAllTemplates = async () => {
+    try {
+      const res = await axiosInstance?.post(
+        "/templates/gettemplates",
+        { buisnessId: "275986335588625" },
+        {
+          headers: {},
+        }
+      );
+      // console.log(res);
+      // if (res?.status === 200) {
+      setTemplates(res?.data?.templates);
+      // } else {
+      // setTemplates([]);
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // TemplateServices?.getAllTemplates(buisnessInfo, () => setTemplates());
+
   const handleChange = (event, newValue) => {
     setSelectedTemplateType(newValue);
   };
+
+  useEffect(() => {
+    // getAllTemplates();
+    // TemplateServices.getAllTemplates(buisnessInfo, setTemplates);
+  }, []);
   return (
-    <Box sx={{ width: "100%", height: "100%", mt: -2 }}>
+    <Box sx={{ width: "100%", height: "100%" }}>
       <Box
         sx={{
           display: "flex",
@@ -120,7 +155,7 @@ export default function Templates() {
       </Box>
 
       <Box sx={{ mt: 2, height: "80%" }}>
-        <TemplateGrid />
+        <SelectTemplate page="Template" />
       </Box>
     </Box>
   );

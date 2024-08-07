@@ -36,7 +36,7 @@ export function ProfileDialogBox() {
   return (
     <>
       <Dialog
-        open={false}
+        open={true}
         maxWidth={false}
         PaperProps={{
           sx: {

@@ -1,11 +1,16 @@
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, TextField, InputAdornment } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MessageStats from "../../../components/BroadCasting/MessageStats";
 import { useNavigate } from "react-router-dom";
 import ListBroadcasting from "../../../components/BroadCasting/ListBroadcasting";
 import BroadcastingDataGrid from "../../../components/BroadCasting/BroadCastingDataGrid";
-
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { useState } from "react";
 export default function Broadcast() {
+  const [tabValue, setTabValue] = useState(0);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   const navigate = useNavigate();
   const messageStats = {
     recipients: 100,
@@ -30,11 +35,50 @@ export default function Broadcast() {
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
           height: "60px",
-          // backgroundColor: "red",
         }}
       >
+        <Box sx={{ display: "flex", flexDirection: "row", width: "40%" }}>
+          <TextField
+            variant="outlined"
+            size="small"
+            // sx={{ width: "40%" }}
+            placeholder="Search"
+            fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchRoundedIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <TextField
+            label="From"
+            size="small"
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+
+          <TextField
+            label="To"
+            size="small"
+            type="date"
+            sx={{ ml: 2 }}
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Box>
         <Button
           variant="contained"
           onClick={() => navigate(`create/`)}
@@ -60,9 +104,9 @@ export default function Broadcast() {
           Create New Broadcast
         </Button>
       </Grid>
-      <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+      {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
         <MessageStats messageStats={messageStats} />
-      </Grid>
+      </Grid> */}
       <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
         <ListBroadcasting />
       </Grid>

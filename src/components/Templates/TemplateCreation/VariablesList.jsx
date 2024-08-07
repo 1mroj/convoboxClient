@@ -1,5 +1,10 @@
-import { Height } from "@mui/icons-material";
 import { Box, TextField, Typography } from "@mui/material";
+import {
+  handleTextChange,
+  handleAddVariable,
+  handleSubstitutionValueChange,
+  handleMappingValueChange,
+} from "./templateFunctions";
 
 const textInputProps = {
   border: "1px solid #848396",
@@ -17,118 +22,186 @@ const textInputProps = {
   },
 };
 
-export default function VariablesList({ templateData, setTemplateData }) {
-  const handleVariableValueChange = (event, variable) => {
-    const newVariableValue = event.target.value;
-    const newTemplateVariables = templateData.templateVariables.map(
-      (templateVariable) => {
-        if (templateVariable.variable === variable.variable) {
-          return { ...templateVariable, value: newVariableValue };
-        }
-        return templateVariable;
-      }
-    );
-    setTemplateData((prevTemplateData) => ({
-      ...prevTemplateData,
-      templateVariables: newTemplateVariables,
-    }));
-  };
+const variableProps = {
+  border: "1px solid #848396",
+  border: "none",
+  borderRadius: "8px",
+  "&:not(.Mui-disabled):before": {
+    borderBottom: "none", // Remove the underline when not focused
+  },
+  "&:hover:not(.Mui-disabled):before": {
+    borderBottom: "none", // Remove the underline when hovered
+  },
+  "&.Mui-focused:before": {
+    borderBottom: "none",
+  },
+};
 
+export default function VariablesList({
+  templateData,
+  setTemplateData,
+  component,
+}) {
   return (
     <>
-      {templateData.templateVariables?.length > 0 && (
-        <Box
-          sx={{
-            width: "100%",
-            minHeight: "100px",
-            borderRadius: "12px",
-            backgroundColor: "#FAF6FF",
-            display: "flex",
-            flexDirection: "row",
-            flexGrow: 1,
-          }}
-        >
+      {templateData.components
+        .filter((component) => component.type === "BODY")
+        .map((bodyComponent, bodyIndex) => (
           <Box
+            key={bodyIndex}
             sx={{
+              width: "95%",
+              backgroundColor: "#FAF6FF",
+              borderRadius: "8px",
+              mt: 1,
               p: 2,
-              width: "20%",
-              flexGrow: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
             }}
           >
-            <Typography
+            <Box
               sx={{
-                color: "#4D4D4D",
-                fontSize: "16px",
-                fontWeight: 700,
-                textAlign: "start",
-                // border: "1px solid black",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
                 mb: 1,
-                pt: 1,
-                pb: 1,
+                width: "100%",
               }}
             >
-              Variable Name
-            </Typography>
-            {templateData.templateVariables.map((variable) => (
-              <Typography
+              <Box
                 sx={{
-                  color: "#4D4D4D",
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  width: "80%",
-                  height: "30px",
-                  textAlign: "center",
-                  border: "1px solid black",
+                  width: "120px",
+                  flex: 0.5,
+                  height: "35px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
                   borderRadius: "6px",
-                  p: 1,
-                  mb: 1,
+                  mr: 2,
                 }}
               >
-                {variable.variable}
-              </Typography>
-            ))}
-          </Box>
+                <Typography
+                  sx={{
+                    color: "#4D4D4D",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                  }}
+                >
+                  Variable
+                </Typography>
+              </Box>
 
-          <Box
-            sx={{
-              p: 2,
-              width: "80%",
-              flexGrow: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-            }}
-          >
-            <Typography
-              sx={{
-                color: "#4D4D4D",
-                fontSize: "16px",
-                fontWeight: 700,
-                textAlign: "start",
-                // border: "1px solid black",
-                pt: 1,
-                pb: 1,
-                mb: 1,
-              }}
-            >
-              Sample value
-            </Typography>
-            {templateData.templateVariables.map((variable) => (
-              <TextField
-                fullWidth
-                size="small"
-                onChange={(event) => handleVariableValueChange(event, variable)}
-                InputProps={{ style: textInputProps }}
-                sx={{ mb: 1 }}
-              ></TextField>
-            ))}
+              <Box
+                sx={{
+                  width: "120px",
+                  flex: 2,
+                  ml: 0.5,
+                  height: "35px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  borderRadius: "6px",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#4D4D4D",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                  }}
+                >
+                  Variable Name
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: "120px",
+                  flex: 2,
+                  ml: 0.5,
+                  height: "35px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#4D4D4D",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                  }}
+                >
+                  Sample Value
+                </Typography>
+              </Box>
+            </Box>
+            {bodyComponent.mappings &&
+              Object.keys(bodyComponent.mappings).map((key, i) => (
+                <Box
+                  key={`${bodyIndex}-${i}`}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    mb: 1,
+                    width: "100%",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "120px",
+                      flex: 0.5,
+                      height: "35px",
+                      display: "grid",
+                      placeItems: "center",
+                      borderRadius: "6px",
+                      border: "1px solid #000",
+                      mr: 2,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: "#4D4D4D",
+                        fontSize: "14px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {key}
+                    </Typography>
+                  </Box>
+
+                  <TextField
+                    InputProps={{
+                      style: variableProps,
+                    }}
+                    onChange={(e) => {
+                      handleMappingValueChange(
+                        "BODY",
+                        key,
+                        e?.target?.value,
+                        setTemplateData
+                      );
+                    }}
+                    sx={{ flex: 2 }}
+                    size="small"
+                  />
+                  <TextField
+                    InputProps={{
+                      style: variableProps,
+                    }}
+                    onChange={(e) => {
+                      handleSubstitutionValueChange(
+                        "BODY",
+                        i,
+                        e?.target?.value,
+                        setTemplateData
+                      );
+                    }}
+                    sx={{ flex: 2, ml: 1 }}
+                    size="small"
+                  />
+                </Box>
+              ))}
           </Box>
-        </Box>
-      )}
+        ))}
     </>
   );
 }

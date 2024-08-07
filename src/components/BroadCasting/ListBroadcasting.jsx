@@ -16,7 +16,7 @@ export default function ListBroadcasting() {
       container
       spacing={2}
       sx={{
-        mt: 1,
+        // mt: 1,
         p: 2,
         display: "flex",
         flexDirection: "row",
@@ -52,7 +52,7 @@ export default function ListBroadcasting() {
         <Tab label="Scheduled" />
       </Tabs>
 
-      <TextField
+      {/* <TextField
         variant="outlined"
         size="small"
         sx={{ width: "35%" }}
@@ -89,7 +89,7 @@ export default function ListBroadcasting() {
             shrink: true,
           }}
         />
-      </Box>
+      </Box> */}
     </Grid>
   );
 }

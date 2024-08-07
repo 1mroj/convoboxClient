@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Typography, TextField, Box, IconButton, Popover } from "@mui/material";
+import {
+  Typography,
+  TextField,
+  Box,
+  IconButton,
+  Popover,
+  Button,
+} from "@mui/material";
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined";
+import { handleTextChange, handleEmojiClick } from "./templateFunctions.js";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import { handleAddVariable } from "./templateFunctions.js";
 import Picker from "emoji-picker-react";
 
 const textInputProps = {
@@ -21,73 +31,10 @@ const textInputProps = {
 export default function BodyTextField(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [text, setText] = useState(props.templateData?.templateBody || "");
-  const { templateData, setTemplateData } = props;
-
-  const handleTextChange = (event) => {
-    if (event.target.value.length <= 1024) {
-      let newText = event.target.value;
-      const variableMatches = newText.match(/{{\d+}}/g);
-      console.log(variableMatches);
-      if (variableMatches) {
-        const lastVariableMatch = variableMatches[variableMatches.length - 1];
-        const lastVariableNumber = parseInt(lastVariableMatch.slice(2, -2));
-        console.log(lastVariableMatch, lastVariableNumber);
-        // If the last variable is not in the correct format
-        if (lastVariableNumber !== variableMatches.length) {
-          // Calculate the last variable index and the new variable number before updating the newText string
-          const lastVariableIndex = newText.lastIndexOf(lastVariableMatch);
-          const newVariableNumber = variableMatches.length;
-          newText =
-            newText.slice(0, lastVariableIndex) +
-            `{{${newVariableNumber}}}` +
-            newText.slice(lastVariableIndex + lastVariableMatch.length);
-          // Set the cursor position based on the updated newText string
-          event.target.selectionStart =
-            lastVariableIndex + `{{${newVariableNumber}}`.length;
-          event.target.selectionEnd =
-            lastVariableIndex + `{{${newVariableNumber}}`.length;
-        }
-      }
-      setTemplateData((prevTemplateData) => ({
-        ...prevTemplateData,
-        templateBody: newText,
-      }));
-      setText(newText);
-      const newVariables = extractVariables(newText);
-      setTemplateData((prevTemplateData) => ({
-        ...prevTemplateData,
-        templateVariables: newVariables,
-      }));
-    }
-  };
-
-  const extractVariables = (text) => {
-    const variablePattern = /{{\d+}}/g;
-    const matches = text.match(variablePattern);
-    if (matches) {
-      const uniqueMatches = Array.from(new Set(matches));
-      console.log(uniqueMatches);
-      return uniqueMatches.map((variable) => ({ variable, value: "" }));
-    }
-    return [];
-  };
+  const { templateData, setTemplateData, component } = props;
 
   const handleEmojiIconClick = (event) => {
     setAnchorEl(event.currentTarget);
-  };
-
-  const handleEmojiSelect = (emoji) => {
-    const cursorPosition =
-      document.getElementById("bodyTextField").selectionStart;
-    const newText = [
-      text.slice(0, cursorPosition),
-      emoji.emoji,
-      text.slice(cursorPosition),
-    ].join("");
-    console.log(newText);
-    setText(newText);
-    setTemplateData({ ...templateData, templateBody: newText });
-    setAnchorEl(null);
   };
 
   const handleClose = () => {
@@ -98,6 +45,7 @@ export default function BodyTextField(props) {
     setText(props.templateData?.templateBody || "");
   }, [props.templateData?.templateBody]);
 
+  console.log(templateData);
   return (
     <>
       <Typography
@@ -113,12 +61,14 @@ export default function BodyTextField(props) {
       </Typography>
       <Box sx={{ position: "relative" }}>
         <TextField
-          id="bodyTextField"
+          id="BODY"
           multiline
           fullWidth
           minRows={10}
-          value={text}
-          onChange={handleTextChange}
+          value={component.text}
+          onChange={(e) => {
+            handleTextChange("BODY", e?.target?.value, setTemplateData);
+          }}
           placeholder={`Hi {{1}}\nWelcome to {{2}}\nOne stop Solutions for all your Business needs`}
           variant="outlined"
           InputProps={{ style: textInputProps }}
@@ -148,7 +98,15 @@ export default function BodyTextField(props) {
           }}
         >
           <Picker
-            onEmojiClick={handleEmojiSelect}
+            onEmojiClick={(e) => {
+              handleEmojiClick(
+                "BODY",
+                e.emoji,
+                templateData,
+                setTemplateData,
+                handleClose
+              );
+            }}
             disableSearchBar={true}
             native={true}
           />
@@ -163,8 +121,30 @@ export default function BodyTextField(props) {
             mt: 1,
           }}
         >
-          {text.length}/1024
+          {component.text.length}/1024
         </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+        }}
+      >
+        <Button
+          variant="text"
+          onClick={() => {
+            handleAddVariable("BODY", templateData, setTemplateData);
+          }}
+          sx={{
+            textTransform: "none",
+            fontFamily: "DM Sans Medium",
+            color: "black",
+          }}
+          startIcon={<AddRoundedIcon />}
+        >
+          Add Variable
+        </Button>
       </Box>
     </>
   );

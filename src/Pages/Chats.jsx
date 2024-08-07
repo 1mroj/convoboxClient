@@ -11,7 +11,7 @@ function Chats() {
       auth: {
         token: {
           wabaid: "275986335588625",
-          phonenumberid: "268715066317890",
+          // phonenumberid: "268715066317890",
         },
       },
     }); // Replace "your-server-address" with your actual server address
@@ -32,7 +32,8 @@ function Chats() {
   const [chatId, setChatId] = useState(null);
 
   const sendMessage = (message) => {
-    // console.log(socket);
+    console.log(socket);
+    console.log(message);
     socket?.emit("sendmessage", message);
   };
   return (

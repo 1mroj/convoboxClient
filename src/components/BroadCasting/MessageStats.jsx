@@ -53,7 +53,6 @@ export default function MessageStats(props) {
     <Grid
       container
       sx={{
-        mt: 1,
         backgroundColor: "#FFF",
         borderRadius: "12px",
         p: 2,
@@ -64,7 +63,7 @@ export default function MessageStats(props) {
           <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
             <Typography
               sx={{
-                fontSize: "22px",
+                fontSize: "18px",
                 fontWeight: 700,
                 textAlign: "left",
                 color: "#53545C",

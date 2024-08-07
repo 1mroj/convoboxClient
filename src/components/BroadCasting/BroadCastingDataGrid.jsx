@@ -195,7 +195,7 @@ export default function BroadcastingDataGrid() {
       pageSize={10}
       rowHeight={70}
       sx={{
-        minHeight: "350px",
+        height: "550px",
         border: "none",
       }}
     />

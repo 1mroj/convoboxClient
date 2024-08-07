@@ -22,6 +22,8 @@ export default function CreateBroadcast() {
         return <SelectAudience />;
       case "Send Broadcast":
         return <SendBroadcast />;
+      default:
+        return <></>;
     }
   };
 

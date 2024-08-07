@@ -3,20 +3,20 @@ import { Box, Typography, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 export function FileDropZone(props) {
-  const { templateData, setTemplateData } = props;
-
+  const { templateData, setTemplateData, component } = props;
+  console.log(component);
   const validateFile = (file) => {
     console.log(file.type);
     if (
-      (templateData.templateHeaderType === "image" &&
+      (component.format === "image" &&
         ["image/jpeg", "image/png", "image/jpg"].includes(file.type) &&
         file.size <= 5 * 1024 * 1024) ||
-      (templateData.templateHeaderType === "video" &&
-        file.type === "video/mp4") ||
-      (templateData.templateHeaderType === "file" &&
+      (component.format === "video" && file.type === "video/mp4") ||
+      (component.format === "file" &&
         file.type === "application/pdf" &&
         file.size <= 10 * 1024 * 1024)
     ) {
+      // console.log("valid  file");
       return file;
     }
     return null;
@@ -28,8 +28,19 @@ export function FileDropZone(props) {
     console.log("Dropped file:", droppedFile);
     const validFile = validateFile(droppedFile);
     if (validFile) {
-      setTemplateData({ ...templateData, templateHeader: validFile });
-      console.log(templateData);
+      setTemplateData((oldData) => {
+        const updatedComponents = oldData?.components?.map((item) => {
+          if (item?.type === "HEADER") {
+            return {
+              ...item,
+              substitution: [droppedFile], // Update the substitution array
+            };
+          }
+          return item; // Return other components unchanged
+        });
+
+        return { ...oldData, components: updatedComponents };
+      });
     }
   };
 
@@ -39,7 +50,19 @@ export function FileDropZone(props) {
     const validFile = validateFile(selectedFile);
     if (validFile) {
       console.log("Inside Valid File");
-      setTemplateData({ ...templateData, templateHeader: validFile });
+      setTemplateData((oldData) => {
+        const updatedComponents = oldData?.components?.map((item) => {
+          if (item?.type === "HEADER") {
+            return {
+              ...item,
+              substitution: [selectedFile], // Update the substitution array
+            };
+          }
+          return item; // Return other components unchanged
+        });
+
+        return { ...oldData, components: updatedComponents };
+      });
       console.log(templateData);
     }
   };
@@ -54,8 +77,20 @@ export function FileDropZone(props) {
   };
 
   const handleCloseIconClick = () => {
-    setTemplateData({ ...templateData, templateHeader: null });
-    setTemplateData({ ...templateData, templateHeaderType: "none" });
+    // console.log(templateData);
+    setTemplateData((oldData) => {
+      const updatedComponents = oldData?.components?.map((item) => {
+        if (item?.type === "HEADER") {
+          return {
+            ...item,
+            substitution: null, // Update the substitution array
+          };
+        }
+        return item; // Return other components unchanged
+      });
+
+      return { ...oldData, components: updatedComponents };
+    });
   };
 
   return (
@@ -69,11 +104,11 @@ export function FileDropZone(props) {
           mb: 1,
         }}
       >
-        {templateData.templateheaderType.charAt(0).toUpperCase() +
-          templateData.templateheaderType.slice(1)}
+        {component.format?.charAt(0)?.toUpperCase() +
+          component.format?.slice(1)}
       </Typography>
 
-      {templateData?.templateHeader ? (
+      {component?.substitution?.length > 0 ? (
         <Box
           sx={{
             mt: 2,
@@ -103,7 +138,7 @@ export function FileDropZone(props) {
                 fontWeight: 400,
               }}
             >
-              {templateData.templateHeader.name}
+              {component?.substitution[0].name}
             </Typography>
             <IconButton onClick={handleCloseIconClick}>
               <CloseIcon />
@@ -131,9 +166,9 @@ export function FileDropZone(props) {
             type="file"
             style={{ display: "none" }}
             accept={
-              templateData.templateHeaderType === "image"
+              component.format === "image"
                 ? "image/jpeg,image/png,image/jpg"
-                : templateData.templateHeaderType === "video"
+                : component.format === "video"
                 ? "video/mp4"
                 : "application/pdf"
             }
@@ -168,9 +203,9 @@ export function FileDropZone(props) {
             Drag and drop your files here
           </Typography>
           <Typography sx={{ fontSize: "12px", fontWeight: 400 }}>
-            {templateData.templateHeaderType === "image"
+            {component.format === "image"
               ? "File types: JPEG, JPG, PNG within 5MB size"
-              : templateData.templateHeaderType === "video"
+              : component.format === "video"
               ? "File types: Mp4 within 10MB size"
               : "File types: Pdf within 10MB size"}
           </Typography>

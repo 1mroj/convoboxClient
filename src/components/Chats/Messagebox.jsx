@@ -36,6 +36,11 @@ function Messagebox({ chatId, sendMessage, socket }) {
     setMessage(""); // Clear the input
   };
 
+  const handleOnchange = (event) => {
+    console.log(event?.target?.value);
+    socket?.emit("onchange", { user: "7b1727" });
+  };
+
   return (
     <Box
       sx={{
@@ -74,7 +79,7 @@ function Messagebox({ chatId, sendMessage, socket }) {
       </List>
       <TextField
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleOnchange}
         fullWidth
         variant="outlined"
         label="Type your message"

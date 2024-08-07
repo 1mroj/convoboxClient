@@ -1,4 +1,10 @@
 import { Box } from "@mui/material";
+import { useState } from "react";
+import WelcomeScreen from "./WelcomeScreen";
+import HomePage from "./HomePage";
+
 export default function DashBoard() {
-  return <Box sx={{ height: "100%" }}>sdasdasdsd</Box>;
+  const [showDashboard, setShowDashboard] = useState(true);
+
+  return <>{showDashboard ? <HomePage /> : <WelcomeScreen />}</>;
 }

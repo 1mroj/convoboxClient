@@ -190,7 +190,7 @@ function Layouts() {
           "& .MuiDrawer-paper": {
             width: 210,
             boxSizing: "border-box",
-            birder: "none",
+            border: "none",
           },
         }}
         variant="permanent"

@@ -15,6 +15,8 @@ import BodyTextFeild from "./BodyTextFeild";
 import VariablesList from "./VariablesList";
 import TemplateFooter from "./TemplateFooter";
 import TemplateButtons from "./TemplateButtons";
+import axiosInstance from "../../../auth/axiosConfig";
+import { SERVER_URL } from "../../../constants";
 
 const headerTypes = [
   { label: "None", type: "none" },
@@ -26,20 +28,79 @@ const headerTypes = [
 ];
 
 export default function TemplateForms(props) {
-  const { templateData, setTemplateData } = props;
+  const { templateData, setTemplateData, mode } = props;
   const [headerType, setHeadertype] = React.useState("none");
   const [bodyText, setBodytext] = useState("");
   const [variables, setVariables] = useState([]);
   const [file, setFile] = useState();
-  const handleChange = (event) => {
-    setTemplateData({
-      ...templateData,
-      templateHeaderType: event.target.value,
-      templateHeader: null,
+  const handleChange = (newForrmat) => {
+    setTemplateData((oldData) => {
+      const updatedComponents = oldData?.components?.map((component) =>
+        component.type === "HEADER"
+          ? {
+              ...component,
+              format: newForrmat,
+            }
+          : component
+      );
+      return { ...oldData, components: updatedComponents };
     });
   };
 
-  // console.log(templateData);
+  const createTemplate = async () => {
+    try {
+      let header;
+      // console.log(templateData);
+
+      if (templateData?.templateHeaderType === "text") {
+        header = {
+          "content-type": "application/json",
+        };
+        console.log("this is text");
+        const res = await axiosInstance?.post(
+          "/templates/create",
+          templateData,
+          header
+        );
+        console.log(res);
+      } else {
+        header = {
+          "content-type": "multipart/form-data",
+        };
+        console.log("this is Media");
+        console.log(templateData);
+        const formdata = new FormData();
+        for (let component of templateData?.components) {
+          console.log(component);
+          if (component?.type === "HEADER" && component?.format !== "text") {
+            const file = component?.substitution[0];
+            formdata.set("file", file);
+          }
+        }
+        formdata.append("category", templateData.category);
+        formdata.append("language", templateData.language);
+        formdata.append("name", templateData.name);
+        formdata.append("templateId", templateData.templateId);
+        formdata?.append("components", templateData?.components);
+        formdata?.append("Button", templateData?.templateButtons);
+
+        // for (let pair of formdata.entries()) {
+        //   console.log(`${pair[0]}: ${pair[1]}`);
+        // }
+
+        const res = await axiosInstance?.post(
+          "/templates/create",
+          formdata,
+          header
+        );
+        console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(templateData);
 
   return (
     <Box
@@ -94,7 +155,7 @@ export default function TemplateForms(props) {
               defaultValue="none"
               name="radio-buttons-group"
               value={templateData?.templateHeaderType}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e?.target?.value)}
               sx={{
                 width: "100%",
                 display: "flex",
@@ -131,52 +192,89 @@ export default function TemplateForms(props) {
               ))}
             </RadioGroup>
           </FormControl>
-          {templateData.templateHeaderType === "text" ? (
-            <TextInput
-              templateData={templateData}
-              setTemplateData={setTemplateData}
-            />
-          ) : (
-            (templateData?.templateHeaderType === "video" ||
-              templateData?.templateHeaderType === "image" ||
-              templateData?.templateHeaderType === "file") && (
-              <FileDropZone
-                templateData={templateData}
-                setTemplateData={setTemplateData}
-              />
-            )
-          )}
+          {templateData?.components?.map((component) => {
+            if (component?.type === "HEADER" && component?.format === "text") {
+              return (
+                <TextInput
+                  templateData={templateData}
+                  setTemplateData={setTemplateData}
+                  component={component}
+                />
+              );
+            } else if (
+              (component?.type === "HEADER" && component?.format === "image") ||
+              component?.format === "video" ||
+              component?.format === "file"
+            ) {
+              return (
+                <FileDropZone
+                  key={component.id} // Ensure each element has a unique key
+                  templateData={templateData}
+                  setTemplateData={setTemplateData}
+                  component={component}
+                />
+              );
+            }
+          })}
         </Box>
-        <Box sx={{ mt: 2, flexGrow: 1 }}>
-          <BodyTextFeild
-            // text={templateData?.templateBody}
-            // setText={setTemplateData}
-            setVariables={setVariables}
-            templateData={templateData}
-            setTemplateData={setTemplateData}
-          />
-        </Box>
-        <Box sx={{ mt: 2, flexGrow: 1 }}>
-          <VariablesList
-            templateData={templateData}
-            setTemplateData={setTemplateData}
-            variables={setTemplateData.templateVariables}
-          />
-        </Box>
+        <>
+          {templateData?.components?.map((component) => {
+            if (component?.type === "BODY") {
+              return (
+                <Box sx={{ mt: 2, flexGrow: 1 }}>
+                  <BodyTextFeild
+                    // text={templateData?.templateBody}
+                    // setText={setTemplateData}
+                    setVariables={setVariables}
+                    templateData={templateData}
+                    setTemplateData={setTemplateData}
+                    component={component}
+                  />
+                </Box>
+              );
+            }
+          })}
+        </>
+        <>
+          {templateData?.components?.map((component) => {
+            if (component?.type === "BODY") {
+              return (
+                component.mappings &&
+                Object.keys(component.mappings).length > 0 && (
+                  <Box sx={{ mt: 2, flexGrow: 1 }}>
+                    <VariablesList
+                      templateData={templateData}
+                      setTemplateData={setTemplateData}
+                      variables={setTemplateData.templateVariables}
+                    />
+                  </Box>
+                )
+              );
+            }
+          })}
+        </>
+        <>
+          {templateData?.components?.map((component) => {
+            if (component?.type === "FOOTER") {
+              return (
+                <Box sx={{ mt: 2, flexGrow: 1 }}>
+                  <TemplateFooter
+                    templateData={templateData}
+                    setTemplateData={setTemplateData}
+                    component={component}
+                  />
+                </Box>
+              );
+            }
+          })}
+        </>
 
-        <Box sx={{ mt: 2, flexGrow: 1 }}>
-          <TemplateFooter
-            templateData={templateData}
-            setTemplateData={setTemplateData}
-          />
-        </Box>
         <Box sx={{ mt: 2, flexGrow: 1 }}>
           <TemplateButtons
             templateData={templateData}
             setTemplateData={setTemplateData}
           />
         </Box>
-
         <Box
           sx={{
             mt: 2,
@@ -187,30 +285,34 @@ export default function TemplateForms(props) {
             justifyContent: "flex-end",
           }}
         >
-          <Button
-            variant="outlined"
-            sx={{
-              pl: 5,
-              pr: 5,
-              color: "#7F2DF1",
-              textTransform: "none",
-              fontSize: "14px",
-              fontWeight: 700,
-              borderRadius: "8px",
-              border: "1px solid #7F2DF1",
-              boxShadow: "none",
-              "&:hover": {
-                border: "1px solid #7F2DF1", // Grayish background color
+          {mode === "create" && (
+            <Button
+              variant="outlined"
+              sx={{
+                pl: 5,
+                pr: 5,
                 color: "#7F2DF1",
+                textTransform: "none",
+                fontSize: "14px",
+                fontWeight: 700,
+                borderRadius: "8px",
+                border: "1px solid #7F2DF1",
                 boxShadow: "none",
-              },
-            }}
-          >
-            Draft
-          </Button>
+                "&:hover": {
+                  border: "1px solid #7F2DF1", // Grayish background color
+                  color: "#7F2DF1",
+                  boxShadow: "none",
+                },
+              }}
+            >
+              Draft
+            </Button>
+          )}
 
           <Button
+            onClick={createTemplate}
             variant="contained"
+            disabled={mode !== "create" ? true : false}
             sx={{
               pl: 2,
               pr: 2,

@@ -6,10 +6,14 @@ import WhatsAppIcon from "../../Assets/whatsapplogo.svg";
 import businessApi from "../../Assets/businessApi.png";
 import { ProfileDialogBox } from "../../components/Onboarding/ProfileDialogBox";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import FacebookLoginComponent from "../../components/FaceBook/LauchWhatsApp";
 
 const user = "Arun";
 
 export default function WelcomeScreen() {
+  const authuser = useAuthUser();
+  console.log(authuser);
   return (
     <>
       <ProfileDialogBox />
@@ -61,36 +65,7 @@ export default function WelcomeScreen() {
               WhatsApp Business API
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "row" }}>
-              <Button
-                variant="contained"
-                sx={{
-                  color: "#7F2DF1",
-                  pl: 4,
-                  pr: 4,
-                  mr: 2,
-                  textTransform: "none",
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  borderRadius: "10px",
-                  backgroundColor: "#FFF",
-                  boxShadow: "none",
-                  "&:hover": {
-                    backgroundColor: "#f5f5f5", // Grayish background color
-                    color: "#5e16c4",
-                    boxShadow: "none",
-                  },
-                }}
-                startIcon={
-                  <img
-                    height="25px"
-                    width="25px"
-                    src={WhatsAppIcon}
-                    alt="WhatsApp Icon"
-                  />
-                }
-              >
-                Apply for WhatsApp Business API ( FREE )
-              </Button>
+              <FacebookLoginComponent type="demo" />
               <Button
                 variant="outlined"
                 sx={{
@@ -168,28 +143,7 @@ export default function WelcomeScreen() {
                 </Typography>
               </Box>
 
-              <Button
-                variant="contained"
-                sx={{
-                  color: "#FFF",
-                  pl: 5,
-                  pr: 5,
-                  textTransform: "none",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  borderRadius: "10px",
-                  backgroundColor: "#7F2DF1",
-                  boxShadow: "none",
-                  "&:hover": {
-                    backgroundColor: "#7F2DF1", // Grayish background color
-                    color: "#FFF",
-                    boxShadow: "none",
-                  },
-                }}
-                endIcon={<ArrowRightAltIcon />}
-              >
-                Launch WhatsApp Onboarding{" "}
-              </Button>
+              <FacebookLoginComponent type="onboard" />
             </Box>
           </Box>
           <Box
