@@ -33,30 +33,24 @@ export default function TemplateForms(props) {
   const [bodyText, setBodytext] = useState("");
   const [variables, setVariables] = useState([]);
   const [file, setFile] = useState();
-  const handleChange = (newForrmat) => {
-    setTemplateData((oldData) => {
-      const updatedComponents = oldData?.components?.map((component) =>
-        component.type === "HEADER"
-          ? {
-              ...component,
-              format: newForrmat,
-            }
-          : component
-      );
-      return { ...oldData, components: updatedComponents };
+  const handleChange = (event) => {
+    setTemplateData({
+      ...templateData,
+      templateHeaderType: event.target.value,
+      templateHeader: null,
     });
   };
 
   const createTemplate = async () => {
     try {
       let header;
-      // console.log(templateData);
-
+      console.log(templateData);
+      // console.log(SERVER_URL);
+      const formdata = new FormData();
       if (templateData?.templateHeaderType === "text") {
         header = {
           "content-type": "application/json",
         };
-        console.log("this is text");
         const res = await axiosInstance?.post(
           "/templates/create",
           templateData,
@@ -67,40 +61,36 @@ export default function TemplateForms(props) {
         header = {
           "content-type": "multipart/form-data",
         };
-        console.log("this is Media");
         console.log(templateData);
-        const formdata = new FormData();
-        for (let component of templateData?.components) {
-          console.log(component);
-          if (component?.type === "HEADER" && component?.format !== "text") {
-            const file = component?.substitution[0];
-            formdata.set("file", file);
-          }
-        }
-        formdata.append("category", templateData.category);
-        formdata.append("language", templateData.language);
-        formdata.append("name", templateData.name);
-        formdata.append("templateId", templateData.templateId);
-        formdata?.append("components", templateData?.components);
-        formdata?.append("Button", templateData?.templateButtons);
 
-        // for (let pair of formdata.entries()) {
-        //   console.log(`${pair[0]}: ${pair[1]}`);
+        // for (let key in templateData) {
+        //   if (templateData[key] instanceof File) {
+        //     // If the value is a File, append it directly
+        //     formdata.append(key, templateData[key]);
+        //   } else if (Array.isArray(templateData[key])) {
+        //     // If the value is an array, stringify it before appending
+        //     formdata.append(key, JSON.stringify(templateData[key]));
+        //   } else {
+        //     // Otherwise, append the value directly
+        //     formdata.append(key, templateData[key]);
+        //   }
         // }
-
-        const res = await axiosInstance?.post(
-          "/templates/create",
-          formdata,
-          header
-        );
-        console.log(res);
+        // console.log(formdata);
+        // const res = await axiosInstance?.post(
+        //   "/templates/create",
+        //   formdata,
+        //   header
+        // );
+        // console.log(res);
       }
+      // console.log(formdata);
+      // console.log(templateData);
     } catch (error) {
       console.log(error);
     }
   };
 
-  console.log(templateData);
+  // console.log(templateData);
 
   return (
     <Box
@@ -155,7 +145,7 @@ export default function TemplateForms(props) {
               defaultValue="none"
               name="radio-buttons-group"
               value={templateData?.templateHeaderType}
-              onChange={(e) => handleChange(e?.target?.value)}
+              onChange={handleChange}
               sx={{
                 width: "100%",
                 display: "flex",
@@ -192,89 +182,52 @@ export default function TemplateForms(props) {
               ))}
             </RadioGroup>
           </FormControl>
-          {templateData?.components?.map((component) => {
-            if (component?.type === "HEADER" && component?.format === "text") {
-              return (
-                <TextInput
-                  templateData={templateData}
-                  setTemplateData={setTemplateData}
-                  component={component}
-                />
-              );
-            } else if (
-              (component?.type === "HEADER" && component?.format === "image") ||
-              component?.format === "video" ||
-              component?.format === "file"
-            ) {
-              return (
-                <FileDropZone
-                  key={component.id} // Ensure each element has a unique key
-                  templateData={templateData}
-                  setTemplateData={setTemplateData}
-                  component={component}
-                />
-              );
-            }
-          })}
+          {templateData.templateHeaderType === "text" ? (
+            <TextInput
+              templateData={templateData}
+              setTemplateData={setTemplateData}
+            />
+          ) : (
+            (templateData?.templateHeaderType === "video" ||
+              templateData?.templateHeaderType === "image" ||
+              templateData?.templateHeaderType === "file") && (
+              <FileDropZone
+                templateData={templateData}
+                setTemplateData={setTemplateData}
+              />
+            )
+          )}
         </Box>
-        <>
-          {templateData?.components?.map((component) => {
-            if (component?.type === "BODY") {
-              return (
-                <Box sx={{ mt: 2, flexGrow: 1 }}>
-                  <BodyTextFeild
-                    // text={templateData?.templateBody}
-                    // setText={setTemplateData}
-                    setVariables={setVariables}
-                    templateData={templateData}
-                    setTemplateData={setTemplateData}
-                    component={component}
-                  />
-                </Box>
-              );
-            }
-          })}
-        </>
-        <>
-          {templateData?.components?.map((component) => {
-            if (component?.type === "BODY") {
-              return (
-                component.mappings &&
-                Object.keys(component.mappings).length > 0 && (
-                  <Box sx={{ mt: 2, flexGrow: 1 }}>
-                    <VariablesList
-                      templateData={templateData}
-                      setTemplateData={setTemplateData}
-                      variables={setTemplateData.templateVariables}
-                    />
-                  </Box>
-                )
-              );
-            }
-          })}
-        </>
-        <>
-          {templateData?.components?.map((component) => {
-            if (component?.type === "FOOTER") {
-              return (
-                <Box sx={{ mt: 2, flexGrow: 1 }}>
-                  <TemplateFooter
-                    templateData={templateData}
-                    setTemplateData={setTemplateData}
-                    component={component}
-                  />
-                </Box>
-              );
-            }
-          })}
-        </>
+        <Box sx={{ mt: 2, flexGrow: 1 }}>
+          <BodyTextFeild
+            // text={templateData?.templateBody}
+            // setText={setTemplateData}
+            setVariables={setVariables}
+            templateData={templateData}
+            setTemplateData={setTemplateData}
+          />
+        </Box>
+        <Box sx={{ mt: 2, flexGrow: 1 }}>
+          <VariablesList
+            templateData={templateData}
+            setTemplateData={setTemplateData}
+            variables={setTemplateData.templateVariables}
+          />
+        </Box>
 
+        <Box sx={{ mt: 2, flexGrow: 1 }}>
+          <TemplateFooter
+            templateData={templateData}
+            setTemplateData={setTemplateData}
+          />
+        </Box>
         <Box sx={{ mt: 2, flexGrow: 1 }}>
           <TemplateButtons
             templateData={templateData}
             setTemplateData={setTemplateData}
           />
         </Box>
+
         <Box
           sx={{
             mt: 2,

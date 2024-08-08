@@ -1,6 +1,13 @@
 import { TextField, Box, Button, InputAdornment } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-export default function ConversationFooter() {
+import { useState } from "react";
+export default function ConversationFooter({
+  socket,
+  sendmessage,
+  selectedconvo,
+}) {
+  console.log(selectedconvo);
+  const [message, setmessage] = useState("");
   return (
     <Box
       sx={{
@@ -17,6 +24,7 @@ export default function ConversationFooter() {
     >
       <Box sx={{ width: "95%" }}>
         <TextField
+          onChange={(e) => setmessage(e?.target?.value)}
           InputProps={{
             endAdornment: (
               <InputAdornment>
@@ -35,6 +43,13 @@ export default function ConversationFooter() {
                       color: "#FFF",
                       boxShadow: "none",
                     },
+                  }}
+                  onClick={() => {
+                    sendmessage({
+                      convoid: selectedconvo,
+                      reciver: selectedconvo?.split(":")[1],
+                      message: message,
+                    });
                   }}
                 >
                   Send

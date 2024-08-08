@@ -262,7 +262,12 @@ export default function MobileScreen(props) {
               },
             }}
           >
-            <ChatBubble templateData={templateData} />
+            {(templateData?.templateBody ||
+              templateData.templateFooter ||
+              templateData.templateButtons.length > 0 ||
+              templateData.templateHeader) && (
+              <ChatBubble templateData={templateData} />
+            )}
           </Box>
           {/* Phone Action Area  */}
           <Box

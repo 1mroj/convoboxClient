@@ -1,6 +1,7 @@
 import whatsappDoodle from "../../Assets/whatsappdoodle.jpeg";
 import { Box } from "@mui/material";
-export default function ConversationBody() {
+export default function ConversationBody({ chats }) {
+  console.log(chats);
   return (
     <Box
       sx={{
@@ -13,6 +14,10 @@ export default function ConversationBody() {
         backgroundRepeat: "repeat",
         backgroundSize: "400px",
       }}
-    ></Box>
+    >
+      {chats?.messages?.map((item) => (
+        <Box>{item?.messages}</Box>
+      ))}
+    </Box>
   );
 }

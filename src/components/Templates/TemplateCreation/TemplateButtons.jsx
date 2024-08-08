@@ -121,7 +121,7 @@ export default function TemplateButtons(props) {
           Add a Button
         </Button>
       </Box>
-      {1 && (
+      {templateData.templateButtons.length > 0 && (
         <Box
           sx={{
             width: "100%",

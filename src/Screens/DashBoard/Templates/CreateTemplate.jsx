@@ -3,7 +3,6 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import TemplateForms from "../../../components/Templates/TemplateCreation/TemplateTextBoxes";
 import MobileScreen from "../../../components/Templates/TemplateCreation/MobileScreen";
-import { serializeTextMappingsAndSubstitutions } from "../../../components/Templates/TemplateCreation/templateFunctions.js";
 import { useState } from "react";
 
 const categories = ["AUTHENTICATION", "MARKETING", "UTILITY"];
@@ -88,53 +87,18 @@ const comboBoxData = [
 
 export default function CreateTemplate() {
   const mode = "create";
-  // const [templateData, setTemplateData] = useState({
-  //   templateName: "",
-  //   templateCategory: "",
-  //   templateLanguage: "",
-  //   templateHeaderType: "none",
-  //   templateHeader: "",
-  //   templateMappings: { mappings: [], substitutions: [] },
-  //   templateheaderType: "none",
-  //   templateBody: "",
-  //   templateFooter: "",
-  //   templateVariables: [],
-  //   templateButtons: [],
-  // });
-
   const [templateData, setTemplateData] = useState({
-    templateId: "",
-    name: "",
-    language: "",
-    category: "",
-    components: [
-      { type: "HEADER", format: "NONE" },
-      { type: "BODY", text: "" },
-      { type: "FOOTER", format: "NONE" },
-      { type: "BUTTONS", buttons: [] },
-    ],
+    templateName: "",
+    templateCategory: "",
+    templateLanguage: "",
+    templateHeaderType: "none",
+    templateHeader: "",
+    templateheaderType: "none",
+    templateBody: "",
+    templateFooter: "",
+    templateVariables: [],
+    templateButtons: [],
   });
-
-  const handleTextChange = (componentType, newText) => {
-    setTemplateData((oldTemplate) => ({
-      ...oldTemplate,
-      components: oldTemplate.components.map((component) => {
-        const updatedComponent = {
-          type: component.type,
-          ...serializeTextMappingsAndSubstitutions(
-            component.type,
-            newText,
-            component.mappings,
-            component.substitutions
-          ),
-        };
-        if (component.type === "HEADER" || component.type === "FOOTER") {
-          updatedComponent.format = component.format;
-        }
-        return component.type === componentType ? updatedComponent : component;
-      }),
-    }));
-  };
 
   const handleCategoryandLanguages = (e, data) => {
     console?.log(data?.title);
@@ -142,12 +106,12 @@ export default function CreateTemplate() {
     if (data?.title === "Languages") {
       setTemplateData({
         ...templateData,
-        language: e?.target?.value,
+        templateLanguage: e?.target?.value,
       });
     } else {
       setTemplateData({
         ...templateData,
-        category: e?.target?.value,
+        templateCategory: e?.target?.value,
       });
     }
   };
@@ -185,7 +149,8 @@ export default function CreateTemplate() {
                 onChange={(e) => {
                   setTemplateData({
                     ...templateData,
-                    name: e?.target?.value,
+
+                    templateName: e?.target?.value,
                   });
                 }}
                 placeholder="template name"

@@ -1,27 +1,89 @@
 import { Grid, Box } from "@mui/material";
 import ContactHeader from "../../components/Conversation/ContactHeader";
 import ConversationSearch from "../../components/Conversation/ConversationSearch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ContactsBar from "../../components/Conversation/Contactsbar";
 import ConversationHeader from "../../components/Conversation/ConversationHeader";
 import ConversationBody from "../../components/Conversation/ConversationBody";
 import ConversationFooter from "../../components/Conversation/ConversationFooter";
 import axios from "axios";
+import io from "socket.io-client";
+const wabaphone = "15550717907";
 
 export default function Conversations() {
   const [contact, setcontact] = useState([]);
+  const [selectedconvo, setselectedconvo] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [chats, setchats] = useState({});
+  const [socket, setSocket] = useState(null);
+  // console.log(process?.env?.REACT_APP_SERVER_BASE_URL);
+
   const getConversation = async () => {
     try {
       const res = await axios?.post(
-        "http://localhost:5000/chats/getConversations",
+        `http://localhost:5000/chats/getConversations`,
         {
-          wabaphone: "",
-        },
+          wabaphone: wabaphone,
+        }
+      );
+      if (res?.status === 200) {
+        setcontact(res?.data?.conversations);
+        console.log(res?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getmessage = async () => {
+    try {
+      const res = await axios?.post(
+        `http://localhost:5000/chats/getmessages/${selectedconvo}`,
+        {},
         {}
       );
-    } catch (errro) {}
+      setchats(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const sendMessage = (message) => {
+    socket?.emit("sendmessage", message);
+  };
+
+  useEffect(() => {
+    getConversation();
+  }, []);
+
+  useEffect(() => {
+    const newsocket = io("http://localhost:5000", {
+      auth: {
+        token: {
+          id: "275986335588625",
+        },
+      },
+    }); // Replace "your-server-address" with your actual server address
+    setSocket(newsocket);
+    // Example event listeners
+    socket?.on("connect", () => {
+      console.log("Connected to server");
+    });
+
+    socket?.on("disconnect", () => {
+      console.log("Disconnected from server");
+    });
+
+    return () => {
+      socket?.disconnect(); // Clean up the socket connection when component unmounts
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedconvo !== null) {
+      getmessage();
+    }
+  }, [selectedconvo]);
   // const [showSearch, setShowSearch] = useState(false);
   return (
     <Grid
@@ -65,7 +127,11 @@ export default function Conversations() {
           setShowSearch={setShowSearch}
         />
 
-        <ContactsBar showSearch={showSearch} />
+        <ContactsBar
+          showSearch={showSearch}
+          conversation={contact}
+          setconvo={(id) => setselectedconvo(id)}
+        />
       </Grid>
       <Grid item xs={8} sm={8} md={8} lg={8} xl={8}>
         <Box
@@ -91,8 +157,12 @@ export default function Conversations() {
           }}
         >
           <ConversationHeader />
-          <ConversationBody />
-          <ConversationFooter />
+          <ConversationBody chats={chats} />
+          <ConversationFooter
+            sendmessage={sendMessage}
+            socket={socket}
+            selectedconvo={selectedconvo}
+          />
         </Box>
       </Grid>
     </Grid>

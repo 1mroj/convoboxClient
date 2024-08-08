@@ -1,6 +1,5 @@
 import { Typography, TextField } from "@mui/material";
 import { useState } from "react";
-import { handleTextChange } from "./templateFunctions";
 
 const textInputprops = {
   border: "1px solid ##848396",
@@ -17,9 +16,19 @@ const textInputprops = {
   },
 };
 export default function TemplateFooter(props) {
-  const { templateData, setTemplateData, component } = props;
+  const { templateData, setTemplateData } = props;
   const [text, setText] = useState(props.templateData?.templateFooter || "");
 
+  const handleTextChange = (event) => {
+    if (event.target.value.length <= 500) {
+      const newText = event.target.value;
+      setTemplateData((prevTemplateData) => ({
+        ...prevTemplateData,
+        templateFooter: newText,
+      }));
+      setText(newText);
+    }
+  };
   return (
     <>
       <Typography
@@ -37,10 +46,8 @@ export default function TemplateFooter(props) {
       <TextField
         fullWidth
         size="small"
-        value={component.text}
-        onChange={(e) => {
-          handleTextChange("FOOTER", e?.target?.value, setTemplateData);
-        }}
+        value={text}
+        onChange={handleTextChange}
         placeholder="You can use this space to add a tagline ,a way to unsubscriber, etc"
         variant="outlined"
         InputProps={{ style: textInputprops }}
